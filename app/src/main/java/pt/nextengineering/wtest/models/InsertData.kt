@@ -1,38 +1,62 @@
 package pt.nextengineering.wtest.models
 
 import android.content.ContentValues
-import android.widget.Toast
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import pt.nextengineering.wtest.BuildConfig
 
-/*
+
 class InsertData {
-    fun insertData(postalCodes : PostalCodes){
-        val db = this.writableDatabase
-        val cv = ContentValues()
-        cv.put(COL_COD_DISTRITO, postalCodes.cod_distrito)
-        cv.put(COL_COD_CONCELHO, postalCodes.cod_concelho)
-        cv.put(COL_COD_LOCALIDADE, postalCodes.cod_localidade)
-        cv.put(COL_NOME_LOCALIDADE, postalCodes.nome_localidade)
-        cv.put(COL_COD_ARTERIA, postalCodes.cod_arteria)
-        cv.put(COL_TIPO_ARTERIA, postalCodes.tipo_arteria)
-        cv.put(COL_PREP1, postalCodes.prep1)
-        cv.put(COL_TITULO_ARTERIA, postalCodes.titulo_arteria)
-        cv.put(COL_PREP2, postalCodes.prep2)
-        cv.put(COL_NOME_ARTERIA, postalCodes.nome_arteria)
-        cv.put(COL_LOCAL_ARTERIA, postalCodes.local_arteria)
-        cv.put(COL_TROCO, postalCodes.troco)
-        cv.put(COL_PORTA, postalCodes.porta)
-        cv.put(COL_CLIENTE, postalCodes.cliente)
-        cv.put(COL_NUM_COD_POSTAL, postalCodes.num_cod_postal)
-        cv.put(COL_EXT_COD_POSTAL1, postalCodes.ext_cod_postal)
-        cv.put(COL_DESIG_POSTAL, postalCodes.desig_postal)
+    var sql : DatabaseCreation? = null
+    constructor(context: Context){
+        sql = DatabaseCreation(context)
+    }
 
-        val result = db.insert(TABLE_NAME, null, cv)
-        if(result == (-1).toLong()){
-            Toast.makeText(context, "Failed SQLite insertion.", Toast.LENGTH_SHORT).show()
+    //open csv and storage in sqlite
+    fun insertData() : Long{
+        val db = sql!!.writableDatabase
+
+        db.beginTransaction()
+        val cv = ContentValues()
+
+        //está na primeira posição
+        val flag = true
+        csvReader().open(("/data/user/0/pt.nextengineering.wtest/").plus(BuildConfig.FILE_NAME)) {
+            readAllAsSequence().forEach { row ->
+                println(row) //[a, b, c]
+                println("********CENAS NA ROW ${row[2]}, ${row[12]}")
+
+                if (flag == false) {
+                    cv.put(PostalCodesColumns.COL_COD_DISTRITO, row[0])
+                    cv.put(PostalCodesColumns.COL_COD_CONCELHO, row[1])
+                    cv.put(PostalCodesColumns.COL_COD_LOCALIDADE, row[2])
+                    cv.put(PostalCodesColumns.COL_NOME_LOCALIDADE, row[3])
+                    cv.put(PostalCodesColumns.COL_COD_ARTERIA, row[4])
+                    cv.put(PostalCodesColumns.COL_TIPO_ARTERIA, row[5])
+                    cv.put(PostalCodesColumns.COL_PREP1, row[6])
+                    cv.put(PostalCodesColumns.COL_TITULO_ARTERIA, row[7])
+                    cv.put(PostalCodesColumns.COL_PREP2, row[8])
+                    cv.put(PostalCodesColumns.COL_NOME_ARTERIA, row[9])
+                    cv.put(PostalCodesColumns.COL_LOCAL_ARTERIA, row[10])
+                    cv.put(PostalCodesColumns.COL_TROCO, row[11])
+                    cv.put(PostalCodesColumns.COL_PORTA, row[12])
+                    cv.put(PostalCodesColumns.COL_CLIENTE, row[13])
+                    cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row[14])
+                    cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row[15])
+                    cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row[16])
+                }
+                else{
+                    //para a 1ª linha não ser lida
+                    flag == false
+                }
+
+            }
         }
-        else{
-            Toast.makeText(context, "Success SQLite insertion.", Toast.LENGTH_SHORT).show()
-        }
+
+        db.setTransactionSuccessful()
+        db.endTransaction()
+
+        return db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
     }
 }
- */

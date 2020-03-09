@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.layout_list_item.view.*
 import pt.nextengineering.wtest.R
-import pt.nextengineering.wtest.models.PostalCodes
+/*import pt.nextengineering.wtest.models.PostalCodes
 
 class MyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
@@ -56,3 +56,4 @@ class MyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         }
     }
 }
+*/

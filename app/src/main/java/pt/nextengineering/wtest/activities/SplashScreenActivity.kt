@@ -1,11 +1,14 @@
 package pt.nextengineering.wtest.activities
 
+import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import pt.nextengineering.wtest.R
+import pt.nextengineering.wtest.models.InsertData
 import pt.nextengineering.wtest.repositories.BreedsRepository
 
 class SplashScreenActivity : AppCompatActivity() {
@@ -43,6 +46,23 @@ class SplashScreenActivity : AppCompatActivity() {
 
         downloadFile.downloadFile(appDirectory)
 
-
+        val db = InsertData(this)
+        val res = db.insertData()
+        if (res != null) {
+            if(res>0){
+                AlertDialog.Builder(this)
+                    .setTitle("Message")
+                    .setMessage("Successfully!!")
+                    .setPositiveButton("ok", null)
+                    .show()
+            }
+            else{
+                AlertDialog.Builder(this)
+                    .setTitle("Message")
+                    .setMessage("Something is wrong...")
+                    .setPositiveButton("ok", null)
+                    .show()
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 package pt.nextengineering.wtest.activities
-
+/*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,3 +25,5 @@ class PostalCodesActivity : AppCompatActivity() {
 
     }
 }
+
+ */

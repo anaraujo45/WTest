@@ -25,6 +25,7 @@ android {
         // Create BuildConfig variables
         buildConfigField "String", "FILE_NAME", properties["FILE_NAME"]
         buildConfigField "String", "DATABASE_NAME", properties["DATABASE_NAME"]
+        buildConfigField "String", "DATABASE_VERSION", properties["DATABASE_VERSION"]
     }
     buildTypes {
         release {

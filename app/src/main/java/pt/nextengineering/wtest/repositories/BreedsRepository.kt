@@ -14,8 +14,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
-import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import pt.nextengineering.wtest.BuildConfig
 
 
@@ -40,14 +38,6 @@ class BreedsRepository {
                     //ficheiro não ficou guardado
                     catch (ex: Exception) {
                         Log.d(TAG, "file not storage")
-                    }
-
-                    //abrir ficheiro e impirmir as primeiras 10
-                    csvReader().open("/data/user/0/pt.nextengineering.wtest/file.csv") {
-                        readAllAsSequence().forEach { row ->
-                            //Do something
-                            println(row) //[a, b, c]
-                        }
                     }
 
                 } else {
