@@ -47,7 +47,7 @@ class SplashScreenActivity : AppCompatActivity() {
         downloadFile.downloadFile(appDirectory)
 
         val db = InsertData(this)
-        val res = db.insertData()
+        val res = db.insertData(appDirectory)
         if (res != null) {
             if(res>0){
                 AlertDialog.Builder(this)

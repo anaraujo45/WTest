@@ -14,19 +14,16 @@ class InsertData {
     }
 
     //open csv and storage in sqlite
-    fun insertData() : Long{
+    fun insertData(appDirectory : String) : Long{
         val db = sql!!.writableDatabase
 
         db.beginTransaction()
         val cv = ContentValues()
 
-        //está na primeira posição
+        //evita que se guarde a 1ª posição
         val flag = true
-        csvReader().open(("/data/user/0/pt.nextengineering.wtest/").plus(BuildConfig.FILE_NAME)) {
+        csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
             readAllAsSequence().forEach { row ->
-                println(row) //[a, b, c]
-                println("********CENAS NA ROW ${row[2]}, ${row[12]}")
-
                 if (flag == false) {
                     cv.put(PostalCodesColumns.COL_COD_DISTRITO, row[0])
                     cv.put(PostalCodesColumns.COL_COD_CONCELHO, row[1])
@@ -47,10 +44,9 @@ class InsertData {
                     cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row[16])
                 }
                 else{
-                    //para a 1ª linha não ser lida
+                    //vamos para a 2ª linha
                     flag == false
                 }
-
             }
         }
 
