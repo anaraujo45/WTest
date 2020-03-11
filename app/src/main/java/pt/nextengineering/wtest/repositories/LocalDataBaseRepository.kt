@@ -1,12 +1,13 @@
-package pt.nextengineering.wtest.models
+package pt.nextengineering.wtest.repositories
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import pt.nextengineering.wtest.BuildConfig
+import pt.nextengineering.wtest.models.PostalCodesColumns
 
 //class responsavel criar a bd
-class DatabaseCreation(context: Context?) : SQLiteOpenHelper(context, BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
+class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context, BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
     val postalCode_table = "CREATE TABLE ${PostalCodesColumns.TABLE_NAME}" +
             "(${PostalCodesColumns.COL_COD_DISTRITO} TEXT, " +
             "${PostalCodesColumns.COL_COD_CONCELHO} INTEGER, " +

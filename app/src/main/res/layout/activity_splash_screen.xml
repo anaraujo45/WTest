@@ -35,6 +35,7 @@
         app:layout_constraintVertical_bias="0.055" />
 
     <ProgressBar
+        android:id="@+id/progress_bar_splash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:outlineAmbientShadowColor="@color/colorPrimaryDark"
@@ -43,6 +44,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.105" />
+        app:layout_constraintVertical_bias="0.105"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
