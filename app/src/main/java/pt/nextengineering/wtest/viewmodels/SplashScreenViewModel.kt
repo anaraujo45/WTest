@@ -38,9 +38,9 @@ class SplashScreenViewModel() : ViewModel(){
                 }
             }
             //o ficheiro não existe, é mandado fazer o download
-            //else{
-            //    repositoryNetworkingRepository.downloadFile(appDirectory)
-            //}
+            else{
+                init(context)
+            }
         }
     }
 

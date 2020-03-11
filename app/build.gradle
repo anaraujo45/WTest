@@ -28,6 +28,9 @@ android {
         buildConfigField "String", "DATABASE_VERSION", properties["DATABASE_VERSION"]
         buildConfigField "String", "PREFS_NAME_DOWNLOAD", properties["PREFS_NAME_DOWNLOAD"]
         buildConfigField "String", "PREFS_NAME_STORAGE_SQLITE", properties["PREFS_NAME_STORAGE_SQLITE"]
+        buildConfigField "String", "LINES_IN_FILE", properties["LINES_IN_FILE"]
+
+
     }
     buildTypes {
         release {
@@ -57,6 +60,9 @@ dependencies {
 
     //para guardar o ficheiro
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
+
+    //para usar threads diferentes (guardar em bd e apresentar dados em ecra)
+    implementation 'org.jetbrains.anko:anko-common:0.9'
 
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3")

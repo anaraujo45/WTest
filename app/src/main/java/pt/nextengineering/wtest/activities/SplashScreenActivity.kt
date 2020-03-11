@@ -34,11 +34,12 @@ class SplashScreenActivity : AppCompatActivity() {
             if (it) {
                 hideProgressBar()
                 //intent para a nova activity
-                Toast.makeText(this, "Boa", Toast.LENGTH_LONG)
+                Toast.makeText(this, "Boa", Toast.LENGTH_LONG).show()
             }
             //algo correu mal
             else {
-                Toast.makeText(this, "Error", Toast.LENGTH_LONG)
+                hideProgressBar()
+                Toast.makeText(this, "Error", Toast.LENGTH_LONG).show()
             }
         })
     }
