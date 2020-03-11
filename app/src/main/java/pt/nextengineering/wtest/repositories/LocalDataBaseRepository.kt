@@ -8,6 +8,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.anko.doAsync
 import pt.nextengineering.wtest.BuildConfig
 import pt.nextengineering.wtest.models.PostalCodesColumns
+import java.io.File
 
 //class responsavel criar a bd
 class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
@@ -31,7 +32,7 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
             "${PostalCodesColumns.COL_NUM_COD_POSTAL} INTEGER, " +
             "${PostalCodesColumns.COL_EXT_COD_POSTAL1} INTEGER, " +
             "${PostalCodesColumns.COL_DESIG_POSTAL} TEXT);"
-    private lateinit var sql : LocalDataBaseRepository
+    private lateinit var sql: LocalDataBaseRepository
     private val dropTable = "DROP TABLE IF EXISTS ${PostalCodesColumns.TABLE_NAME}"
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -43,14 +44,14 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
         onCreate(db)
     }
 
-    fun insertData(appDirectory : String, context: Context, onStorage : (Boolean) -> Unit) {
+    fun insertData(appDirectory: String, context: Context) {
         //usado o doAsync de forma a serem usados dois threads, um para storage na bd e o outro para apresentar dados na activity
         doAsync {
             sql = LocalDataBaseRepository(context)
             val db = sql.writableDatabase
 
             db.beginTransaction()
-            var count :  Int = 0
+            var count: Int = 0
             val cv = ContentValues()
             csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
                 readAllWithHeader().forEach { row ->
@@ -83,14 +84,41 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
 
             println("******************************   ${BuildConfig.LINES_IN_FILE} AND **$count")
 
-            if(count==BuildConfig.LINES_IN_FILE.toInt()){
-                println("**************$count")
-                //informar de que a inserção foi feita
-                onStorage(true)
-            }
-            else{
-                onStorage(false)
+            if (count == BuildConfig.LINES_IN_FILE.toInt()) {
+                //sharedpreference com a informação que já foi feita a inserção na bd
+                sharedpreference(context, true)
+            } else {
+                //sharedpreference com a informação que não foi feita a inserção na bd
+                sharedpreference(context, false)
             }
         }
+    }
+
+    fun sharedpreference(context: Context, state: Boolean) {
+        val sharedPref =
+            context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+
+        val editor = sharedPref.edit()
+        editor.putBoolean("storageFinish", state)
+        editor.apply()
+        editor.commit()
+    }
+
+    fun getSharedPreference(context: Context): Boolean {
+        val sharedPref =
+            context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+        return sharedPref.getBoolean("storageFinish", true)
+    }
+
+
+    //verificar na sharedpreference fez ou não o storage do ficheiro
+    fun fileIsStorage(appDirectory: String, context: Context, isStorage: (Boolean) -> Unit) {
+        //verificar se é true ou false a informação guardada com sharedpreference e envia-la
+        val infoSharedPreference = getSharedPreference(context)
+
+        if(infoSharedPreference)
+            isStorage(infoSharedPreference)
+        else
+            insertData(appDirectory, context)
     }
 }

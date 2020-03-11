@@ -23,8 +23,8 @@ class SplashScreenViewModel() : ViewModel(){
         repositoryNetworkingRepository.fileExists(context, appDirectory){ it ->
             //se o ficheiro existe (it=true) então não é mandado fazer o download
             if (it){
-                //como o ficheiro existe é mandado guardar os dados do ficheiro na bd
-                repositoryLocalDataBaseRepository.insertData(appDirectory, context){ note ->
+                //como o ficheiro existe é verificado se a bd também
+                repositoryLocalDataBaseRepository.fileIsStorage(appDirectory, context){ note ->
                     //se it=true significa que está guardado o ficheiro na bd
                     if(note){
                         //é notificada a activity de que pode avançar, pois tudo está guardado na bd

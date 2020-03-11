@@ -1,6 +1,8 @@
 package pt.nextengineering.wtest.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -32,9 +34,14 @@ class SplashScreenActivity : AppCompatActivity() {
         splashScreenViewModel.getIsUpdatingLiveDataLoaded()?.observe(this, Observer {
             //se true significa que o download e o storage na bd foi efetuado
             if (it) {
-                hideProgressBar()
                 //intent para a nova activity
-                Toast.makeText(this, "Boa", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "All Data is in DataBase", Toast.LENGTH_LONG).show()
+
+                Handler().postDelayed({
+                    startActivity(Intent(this, PostalCodesActivity::class.java))
+                    finish()
+                }, 5000)
+                hideProgressBar()
             }
             //algo correu mal
             else {

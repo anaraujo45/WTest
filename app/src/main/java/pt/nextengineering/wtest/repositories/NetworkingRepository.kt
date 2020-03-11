@@ -38,17 +38,19 @@ class NetworkingRepository {
                 println("************************       $exists")
                 isLoaded(exists)
             }
-            else{
-                downloadFile(appDirectory) {
-                    //se o ficheiro foi guardado é colocada essa informação de forma presistente com sharedpreference
-                    sharedpreference(context)
+            else
+                downloadFile(appDirectory, context){
+                    isLoaded(it)
                 }
-            }
 
         }
+        else
+            downloadFile(appDirectory, context){
+                isLoaded(it)
+            }
     }
 
-    private fun downloadFile(appDirectory : String, onFinnish : (Boolean) -> Unit) {
+    private fun downloadFile(appDirectory : String, context :Context, onFinnish : (Boolean) -> Unit) {
         val retrofitClient = NetworkUtils.getRetrofitInstance()
         val endpoint = retrofitClient.create(Endpoint::class.java)
         val callDownLoad = endpoint.download(true)
@@ -67,7 +69,8 @@ class NetworkingRepository {
                     //ficheiro não ficou guardado
                     catch (ex: Exception) {
                         Log.d(TAG, "file not storage")
-                        //dizer que o download não foi feito
+                        //dizer que o download não foi feito e guardar de forma presistente
+                        sharedpreference(context)
                         onFinnish(true)
                     }
                 } else {
@@ -88,7 +91,7 @@ class NetworkingRepository {
         val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
 
         val editor =  sharedPref.edit()
-        editor.putBoolean("downloadFinish",false)
+        editor.putBoolean("downloadFinish", true)
         editor.apply()
         editor.commit()
 
