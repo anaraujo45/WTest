@@ -24,7 +24,31 @@ class NetworkingRepository {
         val sharedInstance = NetworkingRepository()
     }
 
-    fun downloadFile(appDirectory : String, onFinnish : (Boolean) -> Unit) {
+    //verificar na sharedpreference fez ou não o download e reconfirmar se o ficheiro existe
+    fun fileExists(context: Context, appDirectory : String, isLoaded : (Boolean) -> Unit) {
+
+        //verificar se é true ou false a informação guardada com sharedpreference
+        val infoSharedPreference = getSharedPreference(context)
+
+        //se na sharedpreference está a informação de que o download foi feito, verifico se realmente ele existe
+        if(infoSharedPreference){
+            val file = File(appDirectory, BuildConfig.FILE_NAME)
+            val exists = file.exists()
+            if (exists) {
+                println("************************       $exists")
+                isLoaded(exists)
+            }
+            else{
+                downloadFile(appDirectory) {
+                    //se o ficheiro foi guardado é colocada essa informação de forma presistente com sharedpreference
+                    sharedpreference(context)
+                }
+            }
+
+        }
+    }
+
+    private fun downloadFile(appDirectory : String, onFinnish : (Boolean) -> Unit) {
         val retrofitClient = NetworkUtils.getRetrofitInstance()
         val endpoint = retrofitClient.create(Endpoint::class.java)
         val callDownLoad = endpoint.download(true)
@@ -58,5 +82,24 @@ class NetworkingRepository {
                 onFinnish(true)
             }
         })
+    }
+
+    fun sharedpreference(context: Context){
+        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+
+        val editor =  sharedPref.edit()
+        editor.putBoolean("downloadFinish",false)
+        editor.apply()
+        editor.commit()
+
+        //delete sharedpreferences
+        //val editor = sharedPref.edit().clear()
+        //editor.apply()
+        //editor.commit()
+    }
+
+    fun getSharedPreference(context: Context): Boolean {
+        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+        return sharedPref.getBoolean("downloadFinish", true)
     }
 }
