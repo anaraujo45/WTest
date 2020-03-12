@@ -39,6 +39,7 @@ class DataInDatabaseRepository {
                         list.add(
                             PostalCodes(num_cod_postal, ext_cod_postal, desig_postal)
                         )
+
                     } while (cursor.moveToNext())
                 }
                 postalCodesList=list

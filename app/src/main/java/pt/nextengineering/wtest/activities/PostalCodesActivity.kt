@@ -34,24 +34,25 @@ class PostalCodesActivity : AppCompatActivity() {
             .getInstance(application)
             .create(PostalCodesViewModel::class.java)
 
-        postalCodesViewModel.init(this)
+            postalCodesViewModel.init(this)
 
-        postalCodesViewModel.getPostalCodesLiveData()?.observe(this, Observer {
-            postalCodesAdapter.submitList(it)
-        })
+            //verifica se já há lista
+            postalCodesViewModel.getPostalCodesLiveData()?.observe(this, Observer {
+                    postalCodesAdapter.submitList(it)
+            })
 
-        postalCodesViewModel.getIsUpdatingLiveData()?.observe( this, Observer {
-            if(it){
-                //showProgressBar()
-            }
-            else{
-                //hideProgressBar()
-                postalCodesViewModel.getPostalCodesLiveData()?.value?.size?.let {
-                    recycler_view.smoothScrollToPosition(it - 1)
+            postalCodesViewModel.getIsUpdatingLiveData()?.observe(this, Observer {
+                if (it) {
+                    //showProgressBar()
+                } else {
+                    //hideProgressBar()
+                    postalCodesViewModel.getPostalCodesLiveData()?.value?.size?.let {
+                        recycler_view.smoothScrollToPosition(it - 1)
+                    }
                 }
-            }
-        })
+            })
         initRecyclerView()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -68,18 +69,18 @@ class PostalCodesActivity : AppCompatActivity() {
                 searchView.clearFocus()
                 searchView.setQuery("", false)
                 searchItem.collapseActionView()
+
                 Log.v("Information", "Looking for $query")
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.v("Information", "Looking for $newText")
+                Log.v("Information", "$newText")
                 return false
             }
         })
         return true
     }
-
 
     private fun initRecyclerView() {
         recycler_view.layoutManager = LinearLayoutManager(this)
