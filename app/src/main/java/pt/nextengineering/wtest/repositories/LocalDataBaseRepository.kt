@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.anko.doAsync
 import pt.nextengineering.wtest.BuildConfig
@@ -15,8 +16,8 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
     BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
 
     private val postalCode_table = "CREATE TABLE ${PostalCodesColumns.TABLE_NAME}" +
-            "${PostalCodesColumns.COL_NUM_COD_POSTAL} INTEGER, " +
-            "${PostalCodesColumns.COL_EXT_COD_POSTAL1} INTEGER, " +
+            "${PostalCodesColumns.COL_NUM_COD_POSTAL} TEXT, " +
+            "${PostalCodesColumns.COL_EXT_COD_POSTAL1} TEXT, " +
             "${PostalCodesColumns.COL_DESIG_POSTAL} TEXT);"
     private lateinit var sql: LocalDataBaseRepository
     private val dropTable = "DROP TABLE IF EXISTS ${PostalCodesColumns.TABLE_NAME}"
@@ -46,41 +47,42 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
     }
 
     fun insertData(appDirectory : String, context :Context, onFinishInsert : (Boolean) -> Unit) {
-        //usado o doAsync de forma a serem usados dois threads, um para storage na bd e o outro para apresentar dados na activity
-        doAsync {
-            sql = LocalDataBaseRepository(context)
-            val db = sql.writableDatabase
+        try {
+            //usado o doAsync de forma a serem usados dois threads, um para storage na bd e o outro para apresentar dados na activity
+            doAsync {
+                sql = LocalDataBaseRepository(context)
+                val db = sql.writableDatabase
 
-            db.beginTransaction()
-            val cv = ContentValues()
+                db.beginTransaction()
+                val cv = ContentValues()
 
-            //for para correr até aos 100
+                //for para correr até aos 100
 
-            csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
-            //    readAllWithHeader().forEach { row ->
-                val a = readAllWithHeader()
-                loop@ for (i in 1..100){
-                    val row = a[i]
-                    cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
-                    cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
-                    cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
+                csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
+                    //    readAllWithHeader().forEach { row ->
+                    val a = readAllWithHeader()
+                    loop@ for (i in 1..100) {
+                        val row = a[i]
+                        cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
+                        cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
+                        cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
+                    }
                 }
-            }
-            db.setTransactionSuccessful()
-            db.endTransaction()
+                db.setTransactionSuccessful()
+                db.endTransaction()
 
-            //inserção dos dados do ficheiro na bd
-            db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
+                //inserção dos dados do ficheiro na bd
+                db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
 
-            //verificar se os dados foram inseridos
-            val mCursor: Cursor = db.rawQuery("SELECT * FROM ${BuildConfig.DATABASE_NAME}", null)
-            if (mCursor.moveToFirst()) { // DO SOMETHING WITH CURSOR
                 //sharedpreference com a informação que já foi feita a inserção na bd
                 storedOnDataBaseOnSharedpreference(context, true)
                 onFinishInsert(true)
-            } else { // I AM EMPTY
-                onFinishInsert(false)
             }
+        }
+        //ficheiro não ficou guardado
+        catch (ex: Exception) {
+            Log.d(ContentValues.TAG, "file not insert in database")
+            onFinishInsert(false)
         }
     }
 
