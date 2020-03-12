@@ -9,8 +9,6 @@ import pt.nextengineering.wtest.models.PostalCodesColumns.TABLE_NAME
 
 //class responsavel criar a bd
 class DatabaseCreation(context: Context?) : SQLiteOpenHelper(context, BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
-
-
     val postalCode_table = "CREATE TABLE ${PostalCodesColumns.TABLE_NAME}" +
             "(${PostalCodesColumns.COL_NUM_COD_POSTAL} TEXT, " +
             "${PostalCodesColumns.COL_EXT_COD_POSTAL1} TEXT, " +

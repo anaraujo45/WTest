@@ -35,17 +35,18 @@ class SplashScreenViewModel() : ViewModel(){
                     //se it=true significa que está guardado o ficheiro na bd
                     if(note){
                         //é notificada a activity de que pode avançar, pois tudo está guardado na bd
-                        currentState.value = States.DONE
+                        currentState.postValue(States.DONE)
                     }
                     else{
                         //não foi guardado com sucesso os dados na bd (Wrong)
-                        currentState.value = States.FAIL
+                        //use-se postValues em vez de mudar diretamente o value para não dar crash à app por colocar informação a correr num thread diferente do main
+                        currentState.postValue(States.FAIL)
                     }
                 }
             }
             //o ficheiro não existe
             else{
-                currentState.value = States.FAIL
+                currentState.postValue(States.FAIL)
             }
         }
     }

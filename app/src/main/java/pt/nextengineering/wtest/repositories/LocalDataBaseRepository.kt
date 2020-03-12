@@ -12,6 +12,7 @@ import pt.nextengineering.wtest.models.PostalCodesColumns
 
 //class responsavel criar a bd
 class LocalDataBaseRepository() {
+
     var sql : DatabaseCreation? = null
     constructor(context: Context) : this() {
         sql = DatabaseCreation(context)
@@ -46,24 +47,33 @@ class LocalDataBaseRepository() {
                 val db = sql!!.writableDatabase
 
                 db.beginTransaction()
-                val cv = ContentValues()
-
-                //for para correr até aos 100
+                val cv = ContentValues(100)
                 csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
                     //    readAllWithHeader().forEach { row ->
                     val a = readAllWithHeader()
-                    loop@ for (i in 1..100) {
+                    //for para correr até aos 100
+                    loop@ for (i in 1..10) {
                         val row = a[i]
                         cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
                         cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
                         cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
+
+                        //inserção dos dados do ficheiro na bd
+                        db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
                     }
                 }
                 db.setTransactionSuccessful()
                 db.endTransaction()
 
-                //inserção dos dados do ficheiro na bd
-                db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
+                val mCount = db.rawQuery(
+                    "select count(*) from ${PostalCodesColumns.TABLE_NAME}",
+                    null
+                )
+                mCount.moveToFirst()
+                val count = mCount.getInt(0)
+                mCount.close()
+                Log.d(ContentValues.TAG, "CENAS TOTAl: $count")
+
 
                 onFinishInsert(true)
             }
