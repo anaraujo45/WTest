@@ -8,16 +8,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:layout_marginTop="1dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:background="#E1E0E0">
 
         <TextView
             android:id="@+id/textView_postalCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20sp"
             android:text="5100 - 080, Lamego"
             android:textColor="#000000"
-            android:textSize="12sp" />
+            android:textSize="15sp"
+            android:layout_marginStart="20sp" />
 
     </LinearLayout>
 
