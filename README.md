@@ -1,7 +1,9 @@
 # WTest
+App-Challenge N ext Engineering.
+
 
 ## Sobre
-App-Challenge N ext Engineering
+
 Estes projeto consiste na importação de um ficheiro csv e armazenamento dos dados de forma presistente em bd (SQLite).
 Era pedido também que fosse feito um parse dos dados inseridos e apenas fosse apresentados dados onde ocorreria match. Esta funcionalidade não ficou feita em tempo util.
 Em comentário no código deixei algumas indicações do procedimento (especialmente na parte de importação de dados).
