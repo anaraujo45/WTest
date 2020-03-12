@@ -7,8 +7,9 @@ import pt.nextengineering.wtest.BuildConfig
 import pt.nextengineering.wtest.models.PostalCodesColumns
 import pt.nextengineering.wtest.models.PostalCodesColumns.TABLE_NAME
 
-//class responsavel criar a bd
+//class responsavel criar o drop à bd
 class DatabaseCreation(context: Context?) : SQLiteOpenHelper(context, BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
+    //são inseridos apenas estes valores na bd, pois só estes serão necessários e evitamos assim que a app demore mais tempo a compilar
     val postalCode_table = "CREATE TABLE ${PostalCodesColumns.TABLE_NAME}" +
             "(${PostalCodesColumns.COL_NUM_COD_POSTAL} TEXT, " +
             "${PostalCodesColumns.COL_EXT_COD_POSTAL1} TEXT, " +

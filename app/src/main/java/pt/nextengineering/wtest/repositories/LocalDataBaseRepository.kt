@@ -10,7 +10,7 @@ import org.jetbrains.anko.doAsync
 import pt.nextengineering.wtest.BuildConfig
 import pt.nextengineering.wtest.models.PostalCodesColumns
 
-//class responsavel criar a bd
+//class responsavel por inserir dados na bd
 class LocalDataBaseRepository() {
 
     var sql : DatabaseCreation? = null
@@ -49,11 +49,12 @@ class LocalDataBaseRepository() {
                 db.beginTransaction()
                 val cv = ContentValues(100)
                 csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
-                    //    readAllWithHeader().forEach { row ->
-                    val a = readAllWithHeader()
-                    //for para correr até aos 100
-                    loop@ for (i in 1..10) {
-                        val row = a[i]
+                    readAllWithHeader().forEach { row ->
+
+                    //val a = readAllWithHeader()
+                    //loop@ for (i in 1..10) { //for para correr até aos 100
+                        //val row = a[i]
+
                         cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
                         cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
                         cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
@@ -74,6 +75,7 @@ class LocalDataBaseRepository() {
         }
     }
 
+    //guardar dados de forma persistente
     fun storedOnDataBaseOnSharedpreference(context: Context, state: Boolean) {
         val sharedPref =
             context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)

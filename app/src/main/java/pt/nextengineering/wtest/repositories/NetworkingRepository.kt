@@ -31,7 +31,7 @@ class NetworkingRepository {
         val fileExistOnSharedPreference = getfileExistOnSharedPreference(context)
         val file = File(appDirectory, BuildConfig.FILE_NAME)
 
-        //se na sharedpreference está a informação de que o download foi feito(true), verifico se realmente ele existe
+        //se na sharedpreference está a informação de que o download foi feito(true) e se realmente ele existe
         if(fileExistOnSharedPreference && file.exists()){
             isLoaded(true)
         }
@@ -42,6 +42,7 @@ class NetworkingRepository {
         }
     }
 
+    //download do ficheiro com a ajuda do retrofit
     private fun downloadFile(appDirectory : String, context :Context, onFinnish : (Boolean) -> Unit) {
         val retrofitClient = NetworkUtils.getRetrofitInstance()
         val endpoint = retrofitClient.create(Endpoint::class.java)

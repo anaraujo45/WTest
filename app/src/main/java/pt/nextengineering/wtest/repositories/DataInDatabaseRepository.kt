@@ -7,6 +7,7 @@ import pt.nextengineering.wtest.models.PostalCodes
 import pt.nextengineering.wtest.models.PostalCodesColumns
 import java.lang.Exception
 
+//class responsável por guardar dados numa data class apropriada
 class DataInDatabaseRepository {
     var postalCodesList = ArrayList<PostalCodes>()
 
@@ -15,7 +16,7 @@ class DataInDatabaseRepository {
     }
 
     fun getDataInDataBase(context: Context, success: (List<PostalCodes>) -> Unit, isRead : (Boolean) -> Unit) {
-        //de forma a que a progressBar continue visivel usamos outra thread
+        //de forma a que a progressBar continue visivel manda-se executar o código abaixo noutra thread thread
         doAsync {
 
             //se a list dos códigos postais estiver vazia
@@ -39,7 +40,6 @@ class DataInDatabaseRepository {
                         list.add(
                             PostalCodes(num_cod_postal, ext_cod_postal, desig_postal)
                         )
-
                     } while (cursor.moveToNext())
                 }
                 postalCodesList=list

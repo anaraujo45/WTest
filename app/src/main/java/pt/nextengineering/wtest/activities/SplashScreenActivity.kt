@@ -32,7 +32,9 @@ class SplashScreenActivity : AppCompatActivity() {
 
         //observar o isLoad que dará a indicação se tudo está concluido (download+guardar na bd)
         splashScreenViewModel.getIsUpdatingLiveDataLoaded()?.observe(this, Observer {
-            //se true significa que o download e o storage na bd foi efetuado
+            //Done é usado para indicar que tudo foi feito com sucesso
+            //FAIL é usado para indicar que algo falhou (download ou guardar na bd ou ambos)
+            //LOAD é usado enquanto a app está a carregar dados
             when(it) {
                 SplashScreenViewModel.States.DONE -> {
                     //intent para a nova activity
@@ -40,10 +42,9 @@ class SplashScreenActivity : AppCompatActivity() {
                     Handler().postDelayed({
                         startActivity(Intent(this, PostalCodesActivity::class.java))
                         finish()
-                    }, 3000)
+                    }, 1000)
                 }
 
-                //o download está em execução
                 SplashScreenViewModel.States.LOAD ->{
                     Toast.makeText(this, "Loading data", Toast.LENGTH_SHORT).show()
                 }
