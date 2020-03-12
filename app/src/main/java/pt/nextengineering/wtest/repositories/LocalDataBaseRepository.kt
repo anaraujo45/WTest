@@ -64,17 +64,6 @@ class LocalDataBaseRepository() {
                 }
                 db.setTransactionSuccessful()
                 db.endTransaction()
-
-                val mCount = db.rawQuery(
-                    "select count(*) from ${PostalCodesColumns.TABLE_NAME}",
-                    null
-                )
-                mCount.moveToFirst()
-                val count = mCount.getInt(0)
-                mCount.close()
-                Log.d(ContentValues.TAG, "CENAS TOTAl: $count")
-
-
                 onFinishInsert(true)
             }
             //ficheiro não ficou guardado
