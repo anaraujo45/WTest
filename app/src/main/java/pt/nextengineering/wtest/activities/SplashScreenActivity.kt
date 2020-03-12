@@ -47,7 +47,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
                 //o download está em execução
                 SplashScreenViewModel.States.LOAD ->{
-                    Toast.makeText(this, "Loading data", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Loading data", Toast.LENGTH_SHORT).show()
                 }
 
                 SplashScreenViewModel.States.FAIL ->{
