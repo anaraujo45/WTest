@@ -23,18 +23,23 @@ class LocalDataBaseRepository() {
         val infoSharedPreference = getStoredOnDataBaseOnSharedpreference(context)
 
         if(infoSharedPreference) {
-            //sharedpreference com a informação que já foi feita a inserção na bd
-            storedOnDataBaseOnSharedpreference(context, true)
             onfinnish (true)
         }
         else {
-            insertData(appDirectory, context){
-                onfinnish(it)
+            insertData(appDirectory){
+                if(it){
+                    //sharedpreference com a informação que já foi feita a inserção na bd
+                    storedOnDataBaseOnSharedpreference(context, true)
+                    onfinnish(true)
+                }
+                else{
+                    onfinnish(false)
+                }
             }
         }
     }
 
-    private fun insertData(appDirectory : String, context :Context, onFinishInsert : (Boolean) -> Unit) {
+    private fun insertData(appDirectory : String, onFinishInsert : (Boolean) -> Unit) {
         //usado o doAsync de forma a serem usados dois threads, um para storage na bd e o outro para apresentar dados na activity
         doAsync {
             try {
