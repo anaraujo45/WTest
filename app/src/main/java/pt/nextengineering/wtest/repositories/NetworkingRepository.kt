@@ -86,11 +86,6 @@ class NetworkingRepository {
         editor.putBoolean(BuildConfig.PREFS_NAME_DOWNLOAD, state)
         editor.apply()
         editor.commit()
-
-        //delete sharedpreferences
-        //val editor = sharedPref.edit().clear()
-        //editor.apply()
-        //editor.commit()
     }
 
     fun getfileExistOnSharedPreference(context: Context): Boolean {

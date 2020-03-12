@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import pt.nextengineering.wtest.BuildConfig
 import pt.nextengineering.wtest.repositories.LocalDataBaseRepository
 import pt.nextengineering.wtest.repositories.NetworkingRepository
 

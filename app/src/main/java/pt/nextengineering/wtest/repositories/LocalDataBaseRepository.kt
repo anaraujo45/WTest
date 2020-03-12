@@ -2,6 +2,7 @@ package pt.nextengineering.wtest.repositories
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
@@ -14,25 +15,26 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
     BuildConfig.DATABASE_NAME, null, BuildConfig.DATABASE_VERSION.toInt()) {
 
     private val postalCode_table = "CREATE TABLE ${PostalCodesColumns.TABLE_NAME}" +
-            "(${PostalCodesColumns.COL_COD_DISTRITO} TEXT, " +
-            "${PostalCodesColumns.COL_COD_CONCELHO} INTEGER, " +
-            "${PostalCodesColumns.COL_COD_LOCALIDADE} INTEGER, " +
-            "${PostalCodesColumns.COL_NOME_LOCALIDADE} TEXT," +
-            "${PostalCodesColumns.COL_COD_ARTERIA} INTEGER, " +
-            "${PostalCodesColumns.COL_TIPO_ARTERIA} INTEGER, " +
-            "${PostalCodesColumns.COL_PREP1} INTEGER, " +
-            "${PostalCodesColumns.COL_TITULO_ARTERIA} TEXT," +
-            "${PostalCodesColumns.COL_PREP2} INTEGER, " +
-            "${PostalCodesColumns.COL_NOME_ARTERIA} TEXT," +
-            "${PostalCodesColumns.COL_LOCAL_ARTERIA} INTEGER, " +
-            "${PostalCodesColumns.COL_TROCO} INTEGER, " +
-            "${PostalCodesColumns.COL_PORTA} INTEGER, " +
-            "${PostalCodesColumns.COL_CLIENTE} TEXT," +
             "${PostalCodesColumns.COL_NUM_COD_POSTAL} INTEGER, " +
             "${PostalCodesColumns.COL_EXT_COD_POSTAL1} INTEGER, " +
             "${PostalCodesColumns.COL_DESIG_POSTAL} TEXT);"
     private lateinit var sql: LocalDataBaseRepository
     private val dropTable = "DROP TABLE IF EXISTS ${PostalCodesColumns.TABLE_NAME}"
+
+    //verificar na sharedpreference fez ou não o storage do ficheiro
+    fun importFileDataToDataBase(appDirectory: String, context: Context, onfinnish : (Boolean) -> Unit) {
+        //verificar se é true ou false a informação guardada com sharedpreference e envia-la
+        val infoSharedPreference = getStoredOnDataBaseOnSharedpreference(context)
+
+        if(infoSharedPreference) {
+            onfinnish (infoSharedPreference)
+        }
+        else {
+            insertData(appDirectory, context){
+                onfinnish(it)
+            }
+        }
+    }
 
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(postalCode_table)
@@ -43,7 +45,7 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
         onCreate(db)
     }
 
-    fun insertData(appDirectory: String, context: Context) {
+    fun insertData(appDirectory : String, context :Context, onFinishInsert : (Boolean) -> Unit) {
         //usado o doAsync de forma a serem usados dois threads, um para storage na bd e o outro para apresentar dados na activity
         doAsync {
             sql = LocalDataBaseRepository(context)
@@ -59,20 +61,6 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
                 val a = readAllWithHeader()
                 loop@ for (i in 1..100){
                     val row = a[i]
-                    cv.put(PostalCodesColumns.COL_COD_DISTRITO, row["cod_distrito"])
-                    cv.put(PostalCodesColumns.COL_COD_CONCELHO, row["cod_concelho"])
-                    cv.put(PostalCodesColumns.COL_COD_LOCALIDADE, row["cod_localidade"])
-                    cv.put(PostalCodesColumns.COL_NOME_LOCALIDADE, row["nome_localidade"])
-                    cv.put(PostalCodesColumns.COL_COD_ARTERIA, row["cod_arteria"])
-                    cv.put(PostalCodesColumns.COL_TIPO_ARTERIA, row["tipo_arteria"])
-                    cv.put(PostalCodesColumns.COL_PREP1, row["prep1"])
-                    cv.put(PostalCodesColumns.COL_TITULO_ARTERIA, row["titulo_arteria"])
-                    cv.put(PostalCodesColumns.COL_PREP2, row["prep2"])
-                    cv.put(PostalCodesColumns.COL_NOME_ARTERIA, row["nome_arteria"])
-                    cv.put(PostalCodesColumns.COL_LOCAL_ARTERIA, row["local_arteria"])
-                    cv.put(PostalCodesColumns.COL_TROCO, row["troco"])
-                    cv.put(PostalCodesColumns.COL_PORTA, row["porta"])
-                    cv.put(PostalCodesColumns.COL_CLIENTE, row["cliente"])
                     cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
                     cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
                     cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
@@ -83,8 +71,16 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
 
             //inserção dos dados do ficheiro na bd
             db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
-            //sharedpreference com a informação que já foi feita a inserção na bd
-            storedOnDataBaseOnSharedpreference(context, true)
+
+            //verificar se os dados foram inseridos
+            val mCursor: Cursor = db.rawQuery("SELECT * FROM ${BuildConfig.DATABASE_NAME}", null)
+            if (mCursor.moveToFirst()) { // DO SOMETHING WITH CURSOR
+                //sharedpreference com a informação que já foi feita a inserção na bd
+                storedOnDataBaseOnSharedpreference(context, true)
+                onFinishInsert(true)
+            } else { // I AM EMPTY
+                onFinishInsert(false)
+            }
         }
     }
 
@@ -102,17 +98,5 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
         val sharedPref =
             context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)
         return sharedPref.getBoolean(BuildConfig.PREFS_NAME_STORAGE_SQLITE, false)
-    }
-
-
-    //verificar na sharedpreference fez ou não o storage do ficheiro
-    fun importFileDataToDataBase(appDirectory: String, context: Context, isStorage: (Boolean) -> Unit) {
-        //verificar se é true ou false a informação guardada com sharedpreference e envia-la
-        val infoSharedPreference = getStoredOnDataBaseOnSharedpreference(context)
-
-        if(infoSharedPreference)
-            isStorage(infoSharedPreference)
-        else
-            insertData(appDirectory, context)
     }
 }

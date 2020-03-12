@@ -37,12 +37,10 @@ class SplashScreenActivity : AppCompatActivity() {
                 SplashScreenViewModel.States.DONE -> {
                     //intent para a nova activity
                     Toast.makeText(this, "All Data is import", Toast.LENGTH_LONG).show()
-
                     Handler().postDelayed({
                         startActivity(Intent(this, PostalCodesActivity::class.java))
                         finish()
-                    }, 5000)
-                    hideProgressBar()
+                    }, 3000)
                 }
 
                 //o download está em execução
