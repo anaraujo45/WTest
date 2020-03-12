@@ -15,7 +15,6 @@ Android Studio
 
 ## Implements necessários
 
-São necessários :
 	//recyclerView e cardView
 	*implementation 'com.android.support:recyclerview-v7:29.0.0'
     *implementation 'com.android.support:cardview-v7:29.0.0'
