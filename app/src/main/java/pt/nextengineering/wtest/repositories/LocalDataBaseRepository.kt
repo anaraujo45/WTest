@@ -8,7 +8,6 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.jetbrains.anko.doAsync
 import pt.nextengineering.wtest.BuildConfig
 import pt.nextengineering.wtest.models.PostalCodesColumns
-import java.io.File
 
 //class responsavel criar a bd
 class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
@@ -51,10 +50,15 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
             val db = sql.writableDatabase
 
             db.beginTransaction()
-            var count: Int = 0
             val cv = ContentValues()
+
+            //for para correr até aos 100
+
             csvReader().open(appDirectory.plus("/").plus(BuildConfig.FILE_NAME)) {
-                readAllWithHeader().forEach { row ->
+            //    readAllWithHeader().forEach { row ->
+                val a = readAllWithHeader()
+                loop@ for (i in 1..100){
+                    val row = a[i]
                     cv.put(PostalCodesColumns.COL_COD_DISTRITO, row["cod_distrito"])
                     cv.put(PostalCodesColumns.COL_COD_CONCELHO, row["cod_concelho"])
                     cv.put(PostalCodesColumns.COL_COD_LOCALIDADE, row["cod_localidade"])
@@ -72,8 +76,6 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
                     cv.put(PostalCodesColumns.COL_NUM_COD_POSTAL, row["num_cod_postal"])
                     cv.put(PostalCodesColumns.COL_EXT_COD_POSTAL1, row["ext_cod_postal"])
                     cv.put(PostalCodesColumns.COL_DESIG_POSTAL, row["desig_postal"])
-
-                    count++
                 }
             }
             db.setTransactionSuccessful()
@@ -81,40 +83,32 @@ class LocalDataBaseRepository(context: Context?) : SQLiteOpenHelper(context,
 
             //inserção dos dados do ficheiro na bd
             db!!.insert(PostalCodesColumns.TABLE_NAME, null, cv)
-
-            println("******************************   ${BuildConfig.LINES_IN_FILE} AND **$count")
-
-            if (count == BuildConfig.LINES_IN_FILE.toInt()) {
-                //sharedpreference com a informação que já foi feita a inserção na bd
-                sharedpreference(context, true)
-            } else {
-                //sharedpreference com a informação que não foi feita a inserção na bd
-                sharedpreference(context, false)
-            }
+            //sharedpreference com a informação que já foi feita a inserção na bd
+            storedOnDataBaseOnSharedpreference(context, true)
         }
     }
 
-    fun sharedpreference(context: Context, state: Boolean) {
+    fun storedOnDataBaseOnSharedpreference(context: Context, state: Boolean) {
         val sharedPref =
-            context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+            context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)
 
         val editor = sharedPref.edit()
-        editor.putBoolean("storageFinish", state)
+        editor.putBoolean(BuildConfig.PREFS_NAME_STORAGE_SQLITE, state)
         editor.apply()
         editor.commit()
     }
 
-    fun getSharedPreference(context: Context): Boolean {
+    fun getStoredOnDataBaseOnSharedpreference(context: Context): Boolean {
         val sharedPref =
-            context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
-        return sharedPref.getBoolean("storageFinish", true)
+            context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)
+        return sharedPref.getBoolean(BuildConfig.PREFS_NAME_STORAGE_SQLITE, false)
     }
 
 
     //verificar na sharedpreference fez ou não o storage do ficheiro
-    fun fileIsStorage(appDirectory: String, context: Context, isStorage: (Boolean) -> Unit) {
+    fun importFileDataToDataBase(appDirectory: String, context: Context, isStorage: (Boolean) -> Unit) {
         //verificar se é true ou false a informação guardada com sharedpreference e envia-la
-        val infoSharedPreference = getSharedPreference(context)
+        val infoSharedPreference = getStoredOnDataBaseOnSharedpreference(context)
 
         if(infoSharedPreference)
             isStorage(infoSharedPreference)

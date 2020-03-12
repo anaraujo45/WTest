@@ -10,42 +10,46 @@ import pt.nextengineering.wtest.repositories.NetworkingRepository
 class SplashScreenViewModel() : ViewModel(){
     private lateinit var repositoryLocalDataBaseRepository : LocalDataBaseRepository
     private var repositoryNetworkingRepository : NetworkingRepository = NetworkingRepository.sharedInstance
-    private var isLoaded: MutableLiveData<Boolean> = MutableLiveData()
+    private var currentState: MutableLiveData<States> = MutableLiveData()
+
+    enum class States{
+        DONE, LOAD, FAIL
+    }
 
     fun init(context: Context){
         repositoryLocalDataBaseRepository = LocalDataBaseRepository(context)
+        currentState.value = States.LOAD
 
         //diretorio para o ficheiro
         val appDirectory = context.applicationContext.applicationInfo.dataDir
 
         //listener responsável por mandar ou não efetuar o download
         //caso seja dada a garantia de que o ficheiro existe não é mandado fazer novamente o download
-        repositoryNetworkingRepository.fileExists(context, appDirectory){ it ->
+        repositoryNetworkingRepository.putFileOnLocalStorage(context, appDirectory){ it ->
             //se o ficheiro existe (it=true) então não é mandado fazer o download
             if (it){
                 //como o ficheiro existe é verificado se a bd também
-                repositoryLocalDataBaseRepository.fileIsStorage(appDirectory, context){ note ->
+                repositoryLocalDataBaseRepository.importFileDataToDataBase(appDirectory, context){ note ->
                     //se it=true significa que está guardado o ficheiro na bd
                     if(note){
                         //é notificada a activity de que pode avançar, pois tudo está guardado na bd
-                        isLoaded.value = note
+                        currentState.value = States.DONE
                     }
                     else{
-                        //não foi guardado com sucesso os dados na bd
-                        //é retornado false
-                        isLoaded.value = note
+                        //não foi guardado com sucesso os dados na bd (Wrong)
+                        currentState.value = States.FAIL
                     }
                 }
             }
-            //o ficheiro não existe, é mandado fazer o download
+            //o ficheiro não existe
             else{
-                init(context)
+                currentState.value = States.FAIL
             }
         }
     }
 
-    fun getIsUpdatingLiveDataLoaded(): LiveData<Boolean>? {
-        return isLoaded
+    fun getIsUpdatingLiveDataLoaded(): LiveData<States>? {
+        return currentState
     }
 
 }

@@ -28,8 +28,7 @@ android {
         buildConfigField "String", "DATABASE_VERSION", properties["DATABASE_VERSION"]
         buildConfigField "String", "PREFS_NAME_DOWNLOAD", properties["PREFS_NAME_DOWNLOAD"]
         buildConfigField "String", "PREFS_NAME_STORAGE_SQLITE", properties["PREFS_NAME_STORAGE_SQLITE"]
-        buildConfigField "String", "LINES_IN_FILE", properties["LINES_IN_FILE"]
-
+        buildConfigField "String", "PREFS_GLOBAL", properties["PREFS_GLOBAL"]
 
     }
     buildTypes {

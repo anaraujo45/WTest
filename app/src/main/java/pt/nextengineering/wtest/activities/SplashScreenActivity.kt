@@ -33,20 +33,26 @@ class SplashScreenActivity : AppCompatActivity() {
         //observar o isLoad que dará a indicação se tudo está concluido (download+guardar na bd)
         splashScreenViewModel.getIsUpdatingLiveDataLoaded()?.observe(this, Observer {
             //se true significa que o download e o storage na bd foi efetuado
-            if (it) {
-                //intent para a nova activity
-                Toast.makeText(this, "All Data is in DataBase", Toast.LENGTH_LONG).show()
+            when(it) {
+                SplashScreenViewModel.States.DONE -> {
+                    //intent para a nova activity
+                    Toast.makeText(this, "All Data is import", Toast.LENGTH_LONG).show()
 
-                Handler().postDelayed({
-                    startActivity(Intent(this, PostalCodesActivity::class.java))
-                    finish()
-                }, 5000)
-                hideProgressBar()
-            }
-            //algo correu mal
-            else {
-                hideProgressBar()
-                Toast.makeText(this, "Error", Toast.LENGTH_LONG).show()
+                    Handler().postDelayed({
+                        startActivity(Intent(this, PostalCodesActivity::class.java))
+                        finish()
+                    }, 5000)
+                    hideProgressBar()
+                }
+
+                //o download está em execução
+                SplashScreenViewModel.States.LOAD ->{
+                    Toast.makeText(this, "Loading data", Toast.LENGTH_LONG).show()
+                }
+
+                SplashScreenViewModel.States.FAIL ->{
+                    Toast.makeText(this, "Something is wrong", Toast.LENGTH_LONG).show()
+                }
             }
         })
     }

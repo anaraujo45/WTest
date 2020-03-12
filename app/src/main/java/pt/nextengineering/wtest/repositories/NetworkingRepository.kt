@@ -25,29 +25,21 @@ class NetworkingRepository {
     }
 
     //verificar na sharedpreference fez ou não o download e reconfirmar se o ficheiro existe
-    fun fileExists(context: Context, appDirectory : String, isLoaded : (Boolean) -> Unit) {
+    fun putFileOnLocalStorage(context: Context, appDirectory : String, isLoaded : (Boolean) -> Unit) {
 
         //verificar se é true ou false a informação guardada com sharedpreference
-        val infoSharedPreference = getSharedPreference(context)
+        val fileExistOnSharedPreference = getfileExistOnSharedPreference(context)
+        val file = File(appDirectory, BuildConfig.FILE_NAME)
 
-        //se na sharedpreference está a informação de que o download foi feito, verifico se realmente ele existe
-        if(infoSharedPreference){
-            val file = File(appDirectory, BuildConfig.FILE_NAME)
-            val exists = file.exists()
-            if (exists) {
-                println("************************       $exists")
-                isLoaded(exists)
-            }
-            else
-                downloadFile(appDirectory, context){
-                    isLoaded(it)
-                }
-
+        //se na sharedpreference está a informação de que o download foi feito(true), verifico se realmente ele existe
+        if(fileExistOnSharedPreference && file.exists()){
+            isLoaded(true)
         }
-        else
-            downloadFile(appDirectory, context){
+        else {
+            downloadFile(appDirectory, context) {
                 isLoaded(it)
             }
+        }
     }
 
     private fun downloadFile(appDirectory : String, context :Context, onFinnish : (Boolean) -> Unit) {
@@ -64,34 +56,34 @@ class NetworkingRepository {
                         val fileOutputStream = FileOutputStream(file) //abrir o ficheiro numa determinada diretoria
                         IOUtils.write(response.body()?.bytes(), fileOutputStream)
                         //dizer que o download terminou com o uso de callback
-                        onFinnish(false)
+                        fileExistOnSharedPreference(context, true)
+                        onFinnish(true)
                     }
                     //ficheiro não ficou guardado
                     catch (ex: Exception) {
                         Log.d(TAG, "file not storage")
                         //dizer que o download não foi feito e guardar de forma presistente
-                        sharedpreference(context)
-                        onFinnish(true)
+                        onFinnish(false)
                     }
                 } else {
                     Log.d(TAG, "server contact failed")
                     //dizer que o download não foi feito
-                    onFinnish(true)
+                    onFinnish(false)
                 }
             }
             override fun onFailure(call: Call<ResponseBody?>?, t: Throwable?) {
                 Log.e("onFailure error", t?.message)
                 //dizer que o download não foi feito
-                onFinnish(true)
+                onFinnish(false)
             }
         })
     }
 
-    fun sharedpreference(context: Context){
-        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
+    fun fileExistOnSharedPreference(context: Context, state : Boolean){
+        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)
 
         val editor =  sharedPref.edit()
-        editor.putBoolean("downloadFinish", true)
+        editor.putBoolean(BuildConfig.PREFS_NAME_DOWNLOAD, state)
         editor.apply()
         editor.commit()
 
@@ -101,8 +93,8 @@ class NetworkingRepository {
         //editor.commit()
     }
 
-    fun getSharedPreference(context: Context): Boolean {
-        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_NAME_DOWNLOAD, Context.MODE_PRIVATE)
-        return sharedPref.getBoolean("downloadFinish", true)
+    fun getfileExistOnSharedPreference(context: Context): Boolean {
+        val sharedPref = context.getSharedPreferences(BuildConfig.PREFS_GLOBAL, Context.MODE_PRIVATE)
+        return sharedPref.getBoolean(BuildConfig.PREFS_NAME_DOWNLOAD, false)
     }
 }
